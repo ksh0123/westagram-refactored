@@ -1,0 +1,14 @@
+-- migrate:up
+CREATE TABLE comments (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    comment VARCHAR(512) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT FK_Comments_User_ID FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT FK_Comments_Post_ID FOREIGN KEY (post_id) REFERENCES posts(id)
+);
+
+-- migrate:down
+DROP TABLE comments;
