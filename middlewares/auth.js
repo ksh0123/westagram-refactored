@@ -1,12 +1,12 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-const { catchAsync } = require('../utils/error');
+const { catchAsync } = require("../utils/error");
 
 const validateToken = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    const err = new Error('No Access Token');
+    const err = new Error("No Access Token");
     err.code = 400;
     throw err;
   }

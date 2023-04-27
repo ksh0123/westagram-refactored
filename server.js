@@ -1,7 +1,7 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const { createApp } = require('./app');
-const appDataSource = require('./models/dataSource');
+const { createApp } = require("./app");
+const appDataSource = require("./models/dataSource");
 
 const startServer = async () => {
   const app = createApp();
@@ -10,10 +10,10 @@ const startServer = async () => {
   appDataSource
     .initialize()
     .then(() => {
-      console.log('Datasource has been initialized!');
+      console.log("Datasource has been initialized!");
     })
     .catch((err) => {
-      console.error('Error during datasource initialization', err);
+      console.error("Error during datasource initialization", err);
       appDataSource.destroy();
     });
 
