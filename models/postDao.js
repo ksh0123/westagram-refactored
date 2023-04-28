@@ -1,6 +1,6 @@
 const appDataSource = require("./dataSource");
 
-const addPost = async (userId, imageUrl, content) => {
+const addPost = async (userId, imageUrls, content) => {
   try {
     const rawQuery = `
     INSERT INTO
@@ -8,9 +8,7 @@ const addPost = async (userId, imageUrl, content) => {
     (user_id, image_url, content)
     VALUES (?, ?, ?);`;
 
-    await appDataSource.query(rawQuery, [userId, imageUrl, content]);
-
-    return;
+    return await appDataSource.query(rawQuery, [userId, imageUrls, content]);
   } catch (err) {
     throw new Error("Failed to create post");
   }
@@ -34,6 +32,25 @@ const getPost = async () => {
   }
 };
 
+const getPostById = async (postId) => {
+  try {
+    const rawQuery = `
+      SELECT
+      id,
+      user_id as userId,
+      image_url as imageUrl,
+      content 
+      FROM posts
+      WHERE id = ?;`;
+
+    const posts = await appDataSource.query(rawQuery, postId);
+
+    return posts;
+  } catch (err) {
+    throw new Error("Failed to signup");
+  }
+};
+
 const editPost = async (postId, content) => {
   try {
     const rawQuery = `
@@ -48,23 +65,28 @@ const editPost = async (postId, content) => {
   }
 };
 
-const deletePost = async (postId) => {
+const getImages = async (postId) => {
   try {
     const selectRawQuery = `
     SELECT
-    image_url as imageUrl,
+    image_url as imageUrl
     FROM posts
     WHERE id = ?;`;
 
-    const images = await appDataSource.query(selectRawQuery, postId);
+    const [imageUrl] = await appDataSource.query(selectRawQuery, postId);
+    return imageUrl;
+  } catch (err) {
+    throw new Error("Failed to delete post");
+  }
+};
 
+const deletePost = async (postId) => {
+  try {
     const deleteRawQuery = `
       DELETE FROM posts
       WHERE id = ?;`;
 
-    await appDataSource.query(deleteRawQuery, postId);
-
-    return images;
+    return await appDataSource.query(deleteRawQuery, postId);
   } catch (err) {
     throw new Error("Failed to delete post");
   }
@@ -73,6 +95,8 @@ const deletePost = async (postId) => {
 module.exports = {
   addPost,
   getPost,
+  getImages,
+  getPostById,
   editPost,
   deletePost,
 };

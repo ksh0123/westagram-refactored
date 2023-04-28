@@ -3,11 +3,10 @@ const path = require("path");
 
 const postDao = require("../models/postDao");
 
-const addPost = async (userId, uploadFiles, content) => {
+const addPost = async (userId, imageUrls, content) => {
   try {
-    const imageUrl = uploadFiles.join(",");
-    console.log(imageUrl);
-    return await postDao.addPost(userId, imageUrl, content);
+    const result = await postDao.addPost(userId, imageUrls, content);
+    return result;
   } catch (error) {
     throw error;
   }
@@ -16,6 +15,15 @@ const addPost = async (userId, uploadFiles, content) => {
 const getPost = async () => {
   try {
     const posts = await postDao.getPost();
+    return posts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getPostById = async (postId) => {
+  try {
+    const posts = await postDao.getPostById(postId);
     return posts;
   } catch (error) {
     throw error;
@@ -32,16 +40,17 @@ const editPost = async (postId, content) => {
 
 const deletePost = async (postId) => {
   try {
-    const images = await postDao.deletePost(postId);
-    images = images.split(",");
+    const imageUrl = await postDao.getImages(postId);
+    const result = await postDao.deletePost(postId);
 
-    const imageFiles = fs.readdirSync(path.join(process.cwd(), "uploads"));
-    for (let i = 0; i < images.length; i++) {
-      if (imageFiles.includes(images[i])) fs.unlinkSync(images[i]);
+    if (result.affectedRows >= 0) {
+      let files = imageUrl.imageUrl.split(",");
+      for (let i = 0; i < files.length; i++) {
+        fs.unlinkSync(path.join(process.cwd(), "uploads", files[i]));
+      }
     }
 
-    if (imageFiles.includes(file.filename)) {
-    }
+    return;
   } catch (error) {
     throw error;
   }
@@ -50,6 +59,7 @@ const deletePost = async (postId) => {
 module.exports = {
   addPost,
   getPost,
+  getPostById,
   editPost,
   deletePost,
 };

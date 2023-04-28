@@ -7,15 +7,12 @@ const { catchAsync } = require("../utils/error");
 const addPost = catchAsync(async (req, res) => {
   const { content, userId } = req.body;
   const imageFiles = req.files;
-  const uploadFiles = fs.readdirSync(path.join(process.cwd(), "uploads"));
 
   if (!imageFiles) {
     for (const file of imageFiles) {
-      if (uploadFiles.includes(file.filename)) {
-        fs.unlinkSync(file.path);
-      }
-      throw new Error("Key error");
+      fs.unlinkSync(file.path);
     }
+    throw new Error("Key error");
   }
 
   const images = [];
@@ -23,10 +20,9 @@ const addPost = catchAsync(async (req, res) => {
     images.push(imageFiles[i].filename);
   }
   const imageUrls = images.join(",");
-  console.log(imageUrls);
 
-  await postService.addPost(userId, uploadFiles, content);
-  return res.status(201).json({ message: "Post successfully created!" });
+  const result = await postService.addPost(userId, imageUrls, content);
+  return res.status(201).json({ postId: result.insertId });
 });
 
 const getPost = catchAsync(async (req, res) => {
@@ -51,8 +47,8 @@ const deletePost = catchAsync(async (req, res) => {
     throw new Error("No post ID");
   }
 
-  const postExists = postService.getPost(postId);
-  if (!postExists) {
+  const postExists = await postService.getPostById(postId);
+  if (postExists.length <= 0) {
     throw new Error("Post does not exist");
   }
 

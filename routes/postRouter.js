@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
     if (allowedExtensions.includes(fileExtension.toLowerCase())) {
       cb(null, "image_" + uniqueSuffix + "." + fileExtension);
     } else {
-      cb(new Error("Invalid file extension " + fileExtension));
+      cb(new Error("Invalid file extension"));
     }
   },
 });
